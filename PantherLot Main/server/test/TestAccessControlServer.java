@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+
 import server.controller.AccessControlServer;
 import server.storage.ParkedUsers;
 import server.storage.ParkingSpot;
@@ -174,13 +175,13 @@ public class TestAccessControlServer {
     public void testIsConnectionAvailablePreConnect() throws Exception{
         resetSpots();
         
-        AccessControlServer server = new AccessControlServer(1928);
+        AccessControlServer server = new AccessControlServer(1910);
         server.start();
         
         assertEquals(false,server.isConnectionAvailable("101"));
        // assertEquals(false,server.isConnectionAvailable("9999"));
         
-        SpotStub spot = new SpotStub("101",1928);
+        SpotStub spot = new SpotStub("101",1910);
         spot.start();
         
         assertEquals(true,server.isConnectionAvailable("101"));
@@ -292,6 +293,56 @@ public class TestAccessControlServer {
             }
         }
         assertEquals("Guest",ans);
+    }
+    @Test
+    public void testRunStartServerDuplicateSpots()throws Exception{
+        AccessControlServer server = new AccessControlServer(1934);
+        server.start();
+        SpotStub spot = new SpotStub("139",1934);
+        spot.start();
+        SpotStub spot2 = new SpotStub("139",1934);
+        spot2.start();
+        
+        sleep(1000);
+        
+        String ans = "";
+        int x = 0;
+        while(x != -1 && x<=50){ //if no response is received in 10 seconds, test is deemed failed.
+            x++;
+            ans = spot2.getAnswer();
+            sleep(100);
+            if(ans != ""){
+                x = -1;
+            }
+        }
+        assertEquals("another",ans);
+    }
+    
+    @Test
+    public void testWrongUser() throws Exception{
+    	AccessControlServer server = new AccessControlServer(1934);
+        server.start();
+        SpotStub spot = new SpotStub("139",1934);
+        spot.start();
+        SpotStub security = new SpotStub("security",1934);
+        security.start();
+        
+        security.reListen();
+        spot.wrong();
+        
+        sleep(100);
+        
+        String ans = "";
+        int x = 0;
+        while(x != -1 && x<=50){ //if no response is received in 10 seconds, test is deemed failed.
+            x++;
+            ans = security.getAnswer();
+            sleep(100);
+            if(ans != ""){
+                x = -1;
+            }
+        }
+        assertEquals("wrong",ans);
     }
     
     private void resetSpots(){

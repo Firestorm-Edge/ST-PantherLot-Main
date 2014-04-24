@@ -66,6 +66,37 @@ public class TestEntranceDisplayController {
         spot.removeAssignedUser();
         spot.setPrintWriter(null);
     }
+	
+	@Test
+    public void testFakeIDNoSpot() throws Exception{
+        String testedSpot = "139";
+        String userType = "asdf";
+        String testedID = "1";
+        String expectValid = "Invalid ID! ";
+        String expectAssign = "There are no guest spots avialable";
+        String direction = new GuestUser().toString();
+        
+        ParkedUsers garage = ParkedUsers.getInstance();
+        
+        WelcomeDisplay wDisp = PowerMock.createMock(WelcomeDisplay.class);
+        PowerMock.expectNew(WelcomeDisplay.class).andReturn(wDisp).anyTimes();
+        ParkingNotification pDisp = PowerMock.createMock(ParkingNotification.class);
+        PowerMock.expectNew(ParkingNotification.class).andReturn(pDisp).anyTimes();
+        SpotNumberDisplay sDisp = PowerMock.createMock(SpotNumberDisplay.class);
+        PowerMock.expectNew(SpotNumberDisplay.class).andReturn(sDisp).anyTimes();
+        DisplayDirections dDisp = PowerMock.createMock(DisplayDirections.class);
+        PowerMock.expectNew(DisplayDirections.class).andReturn(dDisp).anyTimes();
+        
+        runDisplayMockSetup(wDisp,pDisp,sDisp,dDisp,null,userType,testedID,expectValid,expectAssign,direction);
+        PowerMock.replay(wDisp, WelcomeDisplay.class, pDisp, ParkingNotification.class, sDisp, SpotNumberDisplay.class, dDisp, DisplayDirections.class);
+        
+        EntranceDisplayController test = new EntranceDisplayController();
+        test.runDisplays();
+        
+        
+        //assertEquals();
+        
+    }
     
     @Test
     public void testGuest() throws Exception{
@@ -167,7 +198,12 @@ public class TestEntranceDisplayController {
         test.runDisplays();
         
         spot = garage.searchBySpotNumber(testedSpot);
+        try{
         assertEquals("Student",spot.getUser().toString());
+        }
+        catch(Exception e){
+        	assertFalse(true);
+        }
         spot.removeAssignedUser();
         spot.setPrintWriter(null);
     }
@@ -237,7 +273,12 @@ public class TestEntranceDisplayController {
         test.runDisplays();
         
         spot = garage.searchBySpotNumber(testedSpot);
-        assertEquals("Faculty",spot.getUser().toString());
+        try{
+        	assertEquals("Faculty",spot.getUser().toString());
+        }
+        catch(Exception e){
+        	assertFalse(true);
+        }
         spot.removeAssignedUser();
         spot.setPrintWriter(null);
     }
@@ -312,10 +353,46 @@ public class TestEntranceDisplayController {
         spot.setPrintWriter(null);
     }
     
+    @Test
+    public void testHandicapped() throws Exception{
+    	String testedSpot = "120";
+        String userType = "handicap";
+        String testedID = "1654333";
+        String expectValid = "Valid Request ";
+        String expectAssign = "Assigning handicapped parking spot";
+        String direction = "Handicapped";
+        
+        ParkedUsers garage = ParkedUsers.getInstance();
+        ParkingSpot spot = garage.searchBySpotNumber(testedSpot);
+        spot.setPrintWriter(new PrintWriter(System.out));
+        spot.removeAssignedUser();
+        
+        WelcomeDisplay wDisp = PowerMock.createMock(WelcomeDisplay.class);
+        PowerMock.expectNew(WelcomeDisplay.class).andReturn(wDisp).anyTimes();
+        ParkingNotification pDisp = PowerMock.createMock(ParkingNotification.class);
+        PowerMock.expectNew(ParkingNotification.class).andReturn(pDisp).anyTimes();
+        SpotNumberDisplay sDisp = PowerMock.createMock(SpotNumberDisplay.class);
+        PowerMock.expectNew(SpotNumberDisplay.class).andReturn(sDisp).anyTimes();
+        DisplayDirections dDisp = PowerMock.createMock(DisplayDirections.class);
+        PowerMock.expectNew(DisplayDirections.class).andReturn(dDisp).anyTimes();
+        
+        runDisplayMockSetup(wDisp,pDisp,sDisp,dDisp,spot,userType,testedID,expectValid,expectAssign,direction);
+        PowerMock.replay(wDisp, WelcomeDisplay.class, pDisp, ParkingNotification.class, sDisp, SpotNumberDisplay.class, dDisp, DisplayDirections.class);
+        
+        EntranceDisplayController test = new EntranceDisplayController();
+        test.runDisplays();
+        
+        spot = garage.searchBySpotNumber(testedSpot);
+        assertEquals("Handicapped",spot.getUser().toString());
+        spot.removeAssignedUser();
+        spot.setPrintWriter(null);
+    }
+    
     
     private void runDisplayMockSetup(WelcomeDisplay wDisp, ParkingNotification pDisp, SpotNumberDisplay sDisp, DisplayDirections dDisp, ParkingSpot spot,  String userType, String testedID, String expectValid, String expectAssign, String direction) throws Exception{
         wDisp.setLocation(new Point(0,0));                      //      line 109
         wDisp.setVisible(true);                                 //      line 110
+        EasyMock.expect(wDisp.displayNext()).andReturn(false);
         EasyMock.expect(wDisp.displayNext()).andReturn(true);            //skips first dialog box.   line 111
         EasyMock.expect(wDisp.getUserType()).andReturn(userType);          //sets the UserType.  line 123
         EasyMock.expect(wDisp.getID()).andReturn(testedID);             //sets the UserID.  Line 124
@@ -323,22 +400,25 @@ public class TestEntranceDisplayController {
         EasyMock.expect(wDisp.getLocation()).andReturn(new Point(0,0));  //sets a point?  line 139
         pDisp.setLocation(new Point(0,0));                      //      line 140
         pDisp.setVisible(true);                                 //      142
+        EasyMock.expect(pDisp.displayNext()).andReturn(false);
         EasyMock.expect(pDisp.displayNext()).andReturn(true);            //skips second dialog box.  line 143
         EasyMock.expect(pDisp.isCanceled()).andReturn(false);            //sets whether or not the menu was cancelled.  line 155
         EasyMock.expect(pDisp.getLocation()).andReturn(new Point(0,0));  //      line 171
-        sDisp.updateParkingSpotNumberLabel("Your spot number is " + spot.getParkingNumber()); //      line 173
+        if(spot != null)sDisp.updateParkingSpotNumberLabel("Your spot number is " + spot.getParkingNumber()); //      line 173
         sDisp.setLocation(new Point(0,0));                      //      line 175
         sDisp.setVisible(true);                                 //      line 176
+        EasyMock.expect(sDisp.displayNext()).andReturn(false);
         EasyMock.expect(sDisp.displayNext()).andReturn(true);            //skips third dialog box.  line 177
         EasyMock.expect(sDisp.isCanceled()).andReturn(false);            //sets whether or not the menu was cancelled.  line 188
         EasyMock.expect(sDisp.getLocation()).andReturn(new Point(0,0));  //      line 194
         dDisp.setLocation(new Point(0,0));
-        dDisp.updateDirections("1. Go to floor #" 
+        if(spot != null)dDisp.updateDirections("1. Go to floor #" 
                 + spot.getFloor() + "\n2. Head to the " 
                     + spot.getDirections() + " part." +
                     "\n3. Park on " + direction 
                             + " spot labeled #" + spot.getParkingNumber()+ ".");
         dDisp.setVisible(true);                                 //      line 202
+        EasyMock.expect(dDisp.displayNext()).andReturn(false);
         EasyMock.expect(dDisp.displayNext()).andReturn(true);            //skips fourth dialog box. line 203
         EasyMock.expect(dDisp.isCanceled()).andReturn(false);            //sets fourth opportunity to cancel.  line 214
         EasyMock.expect(dDisp.getLocation()).andReturn(new Point(0,0));  //      line 221

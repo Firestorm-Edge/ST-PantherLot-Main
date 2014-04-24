@@ -61,9 +61,9 @@ public class SpotStub extends Thread {
                     reListen();
                     command = "";
                 }
-                else if(command == "broadcast"){
-                    System.out.println("COMMAND GET! B");
-                    broadcast();
+                else if(command.equals("wrong")){
+                	System.out.println("COMMAND GET! WROONG");
+                    reListen();
                     command = "";
                 }
                 else if(command == "quit"){
@@ -82,18 +82,15 @@ public class SpotStub extends Thread {
     synchronized public String getAnswer(){
         return answer;
     }
-    public String getTest(){
-        System.out.println("asdf??");
-        return "bleeeh";
-    }
+    
     public void setReListen(){
         this.command = "reListen";
         System.out.println("attempting command R.");
     }
-    public void setBroadcast(){
-        this.command = "broadcast";
-        System.out.println("attempting command B.");
+    public void setWrong(){
+    	this.command = "wrong";
     }
+    
     public void resetAnswer(){
         answer = "";
     }
@@ -110,18 +107,11 @@ public class SpotStub extends Thread {
             }
         }
     }
-    void broadcast() throws Exception{
-        sock = new Socket( address, port );
-            
-            in = sock.getInputStream();
-            out = sock.getOutputStream();
-            
-        printOut.println(spotNumber);
+    void wrong(){
+    	printOut.println("wrong");
     }
-    synchronized public Socket getSocket(){
-        return sock;
-    }
-    synchronized public PrintWriter getPrintWriter(){
-        return printOut;
-    }
+    
+    
+    
+    
 }
