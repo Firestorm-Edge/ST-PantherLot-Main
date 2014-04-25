@@ -390,7 +390,7 @@ public class TestEntranceDisplayController {
     }
     
     
-    private void runDisplayMockSetup(WelcomeDisplay wDisp, ParkingNotification pDisp, SpotNumberDisplay sDisp, DisplayDirections dDisp, ParkingSpot spot,  String userType, String testedID, String expectValid, String expectAssign, String direction) throws Exception{
+    public static void runDisplayMockSetup(WelcomeDisplay wDisp, ParkingNotification pDisp, SpotNumberDisplay sDisp, DisplayDirections dDisp, ParkingSpot spot,  String userType, String testedID, String expectValid, String expectAssign, String direction) throws Exception{
         wDisp.setLocation(new Point(0,0));                      //      line 109
         wDisp.setVisible(true);                                 //      line 110
         EasyMock.expect(wDisp.displayNext()).andReturn(false);

@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="Tools/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="Tools/objenesis-2.1.jar"/>
 	<classpathentry kind="lib" path="Tools/powermock-easymock-1.5.4-full.jar"/>
+	<classpathentry kind="lib" path="Tools/powermock-module-junit4-rule-1.5.4.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
