@@ -19,6 +19,7 @@ import client.maindisplay.SpotNumberDisplay;
 import client.maindisplay.WelcomeDisplay;
 import server.controller.EntranceDisplayController;
 import server.controller.GuestUser;
+import server.controller.ParkingUser;
 import server.storage.ParkedUsers;
 import server.storage.ParkingSpot;
 
@@ -75,6 +76,8 @@ public class TestEntranceDisplayController {
         String expectAssign = "There are no guest spots avialable";
         String direction = new GuestUser().toString();
         
+        ParkedUsers garage = ParkedUsers.getInstance();
+        
         WelcomeDisplay wDisp = PowerMock.createMock(WelcomeDisplay.class);
         PowerMock.expectNew(WelcomeDisplay.class).andReturn(wDisp).anyTimes();
         ParkingNotification pDisp = PowerMock.createMock(ParkingNotification.class);
@@ -91,7 +94,8 @@ public class TestEntranceDisplayController {
         test.runDisplays();
         
         
-        //assertEquals();
+        
+        assertEquals(test.getSpot(),null);
         
     }
     
@@ -470,7 +474,7 @@ public class TestEntranceDisplayController {
     }
     
     @Test
-    public void getDuplicate() throws Exception{
+    public void testgetDuplicate() throws Exception{
         WelcomeDisplay wDisp = PowerMock.createMock(WelcomeDisplay.class);      //setup Mocks
         PowerMock.expectNew(WelcomeDisplay.class).andReturn(wDisp).anyTimes();
         ParkingNotification pDisp = PowerMock.createMock(ParkingNotification.class);

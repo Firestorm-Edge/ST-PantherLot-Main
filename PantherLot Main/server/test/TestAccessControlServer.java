@@ -189,6 +189,24 @@ public class TestAccessControlServer {
         spot.quit();
         
     }
+    @Test
+    public void testIsConnectionAvailableConnect() throws Exception{
+        resetSpots();
+        
+        AccessControlServer server = new AccessControlServer(1910);
+        server.start();
+        
+        //assertEquals(false,server.isConnectionAvailable("101"));
+       // assertEquals(false,server.isConnectionAvailable("9999"));
+        
+        SpotStub spot = new SpotStub("101",1910);
+        spot.start();
+        
+        assertEquals(true,server.isConnectionAvailable("101"));
+        
+        spot.quit();
+        
+    }
     
     //startServer() can't be accessed outside of a thread or it will lock up the main thread forever, which is bad for Unit testing.
     //However, Run() doesn't do anything but access startServer(), so we start the thread to test it.
@@ -295,11 +313,33 @@ public class TestAccessControlServer {
         assertEquals("Guest",ans);
     }
     @Test
+    public void testRunStartServerSpotHandicapped()throws Exception{
+        AccessControlServer server = new AccessControlServer(1933);
+        server.start();
+        SpotStub spot = new SpotStub("120",1933);
+        spot.start();
+        
+        sleep(1000);
+        
+        String ans = "";
+        int x = 0;
+        while(x != -1 && x<=50){ //if no response is recieved in 10 seconds, test is deemed failed.
+            x++;
+            ans = spot.getAnswer();
+            sleep(100);
+            if(ans != ""){
+                x = -1;
+            }
+        }
+        assertEquals("Handicapped",ans);
+    }
+    @Test
     public void testRunStartServerDuplicateSpots()throws Exception{
         AccessControlServer server = new AccessControlServer(1934);
         server.start();
         SpotStub spot = new SpotStub("139",1934);
         spot.start();
+        sleep(100);
         SpotStub spot2 = new SpotStub("139",1934);
         spot2.start();
         
