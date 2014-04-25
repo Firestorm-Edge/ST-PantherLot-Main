@@ -63,7 +63,12 @@ public class SpotStub extends Thread {
                 }
                 else if(command.equals("wrong")){
                 	System.out.println("COMMAND GET! WROONG");
-                    reListen();
+                    wrong();
+                    command = "";
+                }
+                else if(command.equals("leave")){
+                	System.out.println("COMMAND GET! leaves");
+                    leave();
                     command = "";
                 }
                 else if(command == "quit"){
@@ -90,6 +95,9 @@ public class SpotStub extends Thread {
     public void setWrong(){
     	this.command = "wrong";
     }
+    public void setLeave(){
+    	this.command = "leave";
+    }
     
     public void resetAnswer(){
         answer = "";
@@ -106,9 +114,13 @@ public class SpotStub extends Thread {
                 x++;
             }
         }
+        System.out.println(answer);
     }
     void wrong(){
     	printOut.println("wrong");
+    }
+    void leave(){
+    	printOut.println("leave");
     }
     
     

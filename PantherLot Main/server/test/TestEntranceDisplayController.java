@@ -69,14 +69,11 @@ public class TestEntranceDisplayController {
 	
 	@Test
     public void testFakeIDNoSpot() throws Exception{
-        String testedSpot = "139";
         String userType = "asdf";
         String testedID = "1";
         String expectValid = "Invalid ID! ";
         String expectAssign = "There are no guest spots avialable";
         String direction = new GuestUser().toString();
-        
-        ParkedUsers garage = ParkedUsers.getInstance();
         
         WelcomeDisplay wDisp = PowerMock.createMock(WelcomeDisplay.class);
         PowerMock.expectNew(WelcomeDisplay.class).andReturn(wDisp).anyTimes();

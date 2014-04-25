@@ -320,15 +320,18 @@ public class TestAccessControlServer {
     
     @Test
     public void testWrongUser() throws Exception{
-    	AccessControlServer server = new AccessControlServer(1934);
+    	AccessControlServer server = new AccessControlServer(1935);
         server.start();
-        SpotStub spot = new SpotStub("139",1934);
+        SpotStub spot = new SpotStub("139",1935);
         spot.start();
-        SpotStub security = new SpotStub("security",1934);
+        SpotStub security = new SpotStub("security",1935);
         security.start();
         
-        security.reListen();
-        spot.wrong();
+        sleep(100);
+        
+        security.resetAnswer();
+        security.setReListen();
+        spot.setWrong();
         
         sleep(100);
         
@@ -339,11 +342,22 @@ public class TestAccessControlServer {
             ans = security.getAnswer();
             sleep(100);
             if(ans != ""){
-                x = -1;
+            	if(ans.equals("wrong")){
+            		x = -1;
+            	}
+            	else{
+            		spot.setWrong();
+            		sleep(100);
+            		security.resetAnswer();
+                    security.setReListen();
+                    
+            	}
             }
         }
         assertEquals("wrong",ans);
     }
+    
+    
     
     private void resetSpots(){
         ParkedUsers garage = ParkedUsers.getInstance();
